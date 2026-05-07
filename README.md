@@ -51,16 +51,16 @@ This is not a home lab. Every log source, detection rule, alert, and finding doc
 
 ### The Stack Coming Online
 
-**[INSERT: Terminal1.png]**
+*![MongoDB active and running](screenshots/Terminal1.png)***
 *MongoDB `active (running)` — first service confirmed live*
 
-**[INSERT: terminal2.png]**
+**![OpenSearch active and running](screenshots/terminal2.png)**
 *OpenSearch `active (running)` — 4GB heap allocated*
 
-**[INSERT: graylog3.png]**
+**![Graylog login page live on spare PC](screenshots/graylog3.png)**
 *Graylog login page — the moment it all came together*
 
-**[INSERT: graylog4.png]**
+**![Graylog dashboard fully operational](screenshots/graylog4.png)**
 *Graylog dashboard — fully operational, all services connected*
 
 ---
@@ -75,10 +75,10 @@ Three live log sources ingesting data continuously:
 - **Sources:** MPS-DC1, MPS-DC3, Jflan-Desktop1
 - **Stream:** Windows Security Events — filter: `beats_type = winlogbeat`
 
-**[INSERT: graylog5.png]**
+**![Windows Beats Input live on port 5044](screenshots/graylog5.png)**
 *Windows Beats Input — live and receiving on port 5044*
 
-**[INSERT: graylog7.png]**
+**![First Windows Event Logs flowing in](screenshots/graylog7.png)**
 *First Windows Event Logs flowing — 843 messages from a single workstation in 48 hours*
 
 ### 2. Google Workspace Audit Logs
@@ -88,7 +88,7 @@ Three live log sources ingesting data continuously:
 - **Service Account:** graylog-workspace-reader@mcloud-siem.iam.gserviceaccount.com
 - **Log types:** login, admin, drive, token
 
-**[INSERT: graylog9.png]**
+**![Google Workspace audit logs flowing](screenshots/graylog9.png)**
 *Google Workspace audit logs — login events, Drive activity, OAuth tokens across 400+ accounts*
 
 ### 3. Cisco Network Syslog
@@ -96,7 +96,7 @@ Three live log sources ingesting data continuously:
 - **Port:** 514
 - **Source:** Cisco core switch
 
-**[INSERT: graylog8.png]**
+**![Cisco syslog fiber optic threshold violations](screenshots/graylog8.png)**
 *Cisco syslog — fiber optic threshold violations caught on day one*
 
 ```
@@ -112,7 +112,7 @@ Operating value: -14.1 dBm, Threshold value: -13.3 dBm
 
 Seven rules running every 60 seconds against the live log stream.
 
-**[INSERT: graylog16.png]**
+**![All seven detection rules live](screenshots/graylog16.png)**
 *All 7 detection rules live and enabled*
 
 | Rule | Query | Threshold | Severity |
@@ -143,14 +143,14 @@ Seven rules running every 60 seconds against the live log stream.
 
 ### First Alert — Brute Force Confirmed
 
-**[INSERT: graylog17.png]**
+**![First brute force alert firing](screenshots/graylog17.png)**
 *Brute Force — Windows Login alert firing — confirmed end-to-end with email delivered*
 
 Email alerting configured via Gmail SMTP (`smtp.gmail.com:587`) — alerts delivered to `crooks@mcloudschools.us`.
 
 ### The 1,840 Email Lesson
 
-**[INSERT: brute1.png]**
+**![1840 alert emails in inbox](screenshots/brute1.png)**
 *1,840 alert emails — one per minute for 12 hours overnight*
 
 The after-hours authentication rule fired every minute overnight after connecting the domain controllers. Investigation revealed machine accounts ($) renewing Kerberos tickets — a false positive. Rule tuned from threshold 1 → 50. Grace period raised to 60 minutes.
@@ -159,7 +159,7 @@ The after-hours authentication rule fired every minute overnight after connectin
 
 ### False Positive Investigation
 
-**[INSERT: Screenshot_From_2026-04-27_11-23-07.png]**
+**![After hours authentication 408 events](screenshots/Screenshot_From_2026-04-27_11-23-07.png)**
 *408 after-hours authentication events — investigated and resolved as false positive*
 
 Account names examined: `HSWLAB2025-23$`, `MPS-DC1$`, `HSE-RM14$` — all machine accounts performing normal Kerberos ticket renewal. No threat. Rule tuned. Documented.
@@ -250,7 +250,7 @@ Nessus Essentials deployed. Initial scan of 5 priority hosts completed.
 
 ## 📝 Write-Up Series
 
-This project is documented in a Substack series: *[Link to your Substack]*
+This project is documented in a Substack series: *https://open.substack.com/pub/rooksanalyst/p/i-built-a-siem-for-my-school-district?r=5lf6xn&utm_campaign=post-expanded-share&utm_medium=web*
 
 Post 1: *I Built a SIEM for My School District on a Spare PC. Here's What Happened on Day One.*
 
