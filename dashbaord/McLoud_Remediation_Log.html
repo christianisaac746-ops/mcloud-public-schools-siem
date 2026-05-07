@@ -1,0 +1,200 @@
+Output
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>McLoud Public Schools — Remediation Log</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #F5F5F5; color: #1A1A1A; }
+.topbar { background: #111111; padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
+.logo { width: 40px; height: 40px; }
+.top-title { color: white; font-size: 15px; font-weight: 700; letter-spacing: 0.05em; }
+.top-sub { color: #AAAAAA; font-size: 12px; margin-top: 2px; }
+.red-bar { height: 4px; background: #CC0000; }
+.content { max-width: 1200px; margin: 24px auto; padding: 0 20px; }
+.page-title { font-size: 20px; font-weight: 700; color: #111111; margin-bottom: 4px; }
+.page-sub { font-size: 13px; color: #888888; margin-bottom: 20px; }
+.stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+.stat { background: white; border: 1px solid #E0E0E0; border-radius: 8px; padding: 14px 16px; }
+.stat-label { font-size: 11px; color: #888888; letter-spacing: 0.08em; margin-bottom: 6px; }
+.stat-val { font-size: 28px; font-weight: 700; }
+.stat-val.red { color: #CC0000; }
+.stat-val.orange { color: #E67E22; }
+.stat-val.green { color: #27AE60; }
+.stat-val.gray { color: #888888; }
+.toolbar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+.btn { padding: 8px 16px; border-radius: 6px; border: 1px solid #E0E0E0; background: white; font-size: 13px; cursor: pointer; font-family: Arial; }
+.btn:hover { background: #F5F5F5; }
+.btn-red { border-color: #CC0000; color: #CC0000; }
+.btn-red:hover { background: #FFF0F0; }
+.btn-dark { background: #111111; color: white; border-color: #111111; }
+.btn-dark:hover { background: #333333; }
+table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #E0E0E0; }
+thead tr { background: #111111; }
+thead th { color: white; font-size: 12px; font-weight: 600; padding: 10px 12px; text-align: left; letter-spacing: 0.05em; }
+tbody tr { border-bottom: 1px solid #F0F0F0; }
+tbody tr:hover { background: #FAFAFA; }
+tbody td { padding: 8px 12px; font-size: 13px; vertical-align: middle; }
+input[type=text], input[type=date], select, textarea { font-size: 12px; padding: 5px 8px; border: 1px solid #E0E0E0; border-radius: 4px; font-family: Arial; width: 100%; background: white; }
+input[type=text]:focus, input[type=date]:focus, select:focus { outline: none; border-color: #CC0000; }
+.sev-high { color: #CC0000; font-weight: 700; font-size: 11px; }
+.sev-medium { color: #E67E22; font-weight: 700; font-size: 11px; }
+.sev-info { color: #1565C0; font-weight: 700; font-size: 11px; }
+.status-open { color: #CC0000; font-weight: 600; font-size: 12px; }
+.status-progress { color: #E67E22; font-weight: 600; font-size: 12px; }
+.status-resolved { color: #27AE60; font-weight: 600; font-size: 12px; }
+.del-btn { color: #CCCCCC; border: none; background: none; cursor: pointer; font-size: 16px; padding: 2px 6px; }
+.del-btn:hover { color: #CC0000; }
+.notes-input { width: 100%; min-height: 40px; resize: vertical; }
+.footer { text-align: center; font-size: 12px; color: #AAAAAA; margin: 24px 0; }
+.industry-note { background: #FFF8E7; border: 1px solid #F0C040; border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; font-size: 13px; color: #7A5000; line-height: 1.6; }
+.industry-note strong { color: #5A3800; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="top-title">McLoud Public Schools</div>
+    <div class="top-sub">Shaping Minds, Forging Futures &nbsp;·&nbsp; Enigma Labs LLC Cybersecurity Internship</div>
+  </div>
+</div>
+<div class="red-bar"></div>
+
+<div class="content">
+  <div class="page-title">Vulnerability Remediation Log</div>
+  <div class="page-sub" id="page-sub">McLoud Vulnerability Scan · April 28, 2026 · 56 findings across 5 hosts</div>
+
+  <div class="industry-note">
+    <strong>Industry Standard Practice:</strong> Log every action taken against a finding — even partial steps. Include who did it, when, and what the outcome was. Update status to <strong>Resolved</strong> only after a validation Nessus scan confirms the vulnerability no longer appears. Keep this log as evidence of due diligence — it protects the district and documents your work.
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-label">TOTAL FINDINGS</div><div class="stat-val gray" id="stat-total">8</div></div>
+    <div class="stat"><div class="stat-label">OPEN</div><div class="stat-val red" id="stat-open">8</div></div>
+    <div class="stat"><div class="stat-label">IN PROGRESS</div><div class="stat-val orange" id="stat-prog">0</div></div>
+    <div class="stat"><div class="stat-label">RESOLVED</div><div class="stat-val green" id="stat-res">0</div></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn btn-dark" onclick="addRow()">+ Add Entry</button>
+    <button class="btn btn-red" onclick="exportCSV()">Export CSV</button>
+    <button class="btn btn-red" onclick="exportText()">Export Text</button>
+    <button class="btn" onclick="window.print()">Print</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:100px;">Date</th>
+        <th>Finding / Action Taken</th>
+        <th style="width:90px;">Host</th>
+        <th style="width:80px;">Severity</th>
+        <th style="width:90px;">Owner</th>
+        <th style="width:110px;">Status</th>
+        <th style="width:200px;">Notes / Evidence</th>
+        <th style="width:32px;"></th>
+      </tr>
+    </thead>
+    <tbody id="log-body"></tbody>
+  </table>
+
+  <div class="footer">McLoud Public Schools &nbsp;·&nbsp; Enigma Labs LLC &nbsp;·&nbsp; Confidential &nbsp;·&nbsp; <span id="gen-date"></span></div>
+</div>
+
+<script>
+var rows = [
+  { date:"2026-04-28", finding:"IPMI v2.0 Password Hash Disclosure — vulnerability identified via Nessus scan", host:"10.5.0.20\n10.5.0.21", sev:"HIGH", owner:"crooks", status:"OPEN", notes:"EPSS 73% — IMMEDIATE priority. Isolate to management VLAN, update firmware, change password." },
+  { date:"2026-04-28", finding:"SWEET32 Weak SSL Cipher Suites (3DES) — identified via Nessus scan", host:"10.5.1.10\n10.5.1.1", sev:"HIGH", owner:"crooks", status:"OPEN", notes:"CVSS 7.5. Disable 3DES via registry on both DCs." },
+  { date:"2026-04-28", finding:"TLS 1.0 Deprecated Protocol — identified via Nessus scan", host:"10.5.1.10\n10.5.1.1", sev:"MEDIUM", owner:"crooks", status:"OPEN", notes:"Check legacy software compatibility before disabling." },
+  { date:"2026-04-28", finding:"TLS 1.1 Deprecated Protocol — identified via Nessus scan", host:"10.5.1.10\n10.5.1.1", sev:"MEDIUM", owner:"crooks", status:"OPEN", notes:"Disable via registry after TLS 1.0 is confirmed working." },
+  { date:"2026-04-28", finding:"SMB Signing Not Required — identified via Nessus scan", host:"10.5.1.10", sev:"MEDIUM", owner:"crooks", status:"OPEN", notes:"Enable via GPO. Test printers/scanners for SMB signing support first." },
+  { date:"2026-04-28", finding:"SSL Self-Signed / Untrusted Certificate — identified via Nessus scan", host:"DCs + iLO", sev:"MEDIUM", owner:"crooks", status:"OPEN", notes:"Deploy internal CA certificate or trusted cert." },
+  { date:"2026-04-28", finding:"SMBv1 Protocol Detected (unconfirmed) — verify and disable if confirmed", host:"10.5.1.10", sev:"INFO", owner:"crooks", status:"OPEN", notes:"Run: Get-SmbServerConfiguration | Select EnableSMB1Protocol" },
+  { date:"2026-04-28", finding:"Ubuntu 24.10 End of Life — plan migration to Ubuntu 24.04 LTS", host:"10.5.1.35", sev:"INFO", owner:"crooks", status:"OPEN", notes:"Schedule maintenance window. Back up Graylog config first." },
+];
+
+function sevClass(s){ return s==="HIGH"?"sev-high":s==="MEDIUM"?"sev-medium":"sev-info"; }
+function statClass(s){ return s==="OPEN"?"status-open":s==="IN PROGRESS"?"status-progress":"status-resolved"; }
+
+function updateStats(){
+  var open=0,prog=0,res=0;
+  rows.forEach(function(r){
+    if(r.status==="OPEN") open++;
+    else if(r.status==="IN PROGRESS") prog++;
+    else res++;
+  });
+  document.getElementById('stat-total').textContent=rows.length;
+  document.getElementById('stat-open').textContent=open;
+  document.getElementById('stat-prog').textContent=prog;
+  document.getElementById('stat-res').textContent=res;
+}
+
+function render(){
+  var body=document.getElementById('log-body');
+  body.innerHTML=rows.map(function(r,i){
+    return '<tr>'
+      +'<td><input type="date" value="'+r.date+'" onchange="rows['+i+'].date=this.value;updateStats()"></td>'
+      +'<td><input type="text" value="'+r.finding.replace(/"/g,"&quot;")+'" onchange="rows['+i+'].finding=this.value"></td>'
+      +'<td><input type="text" value="'+r.host+'" onchange="rows['+i+'].host=this.value"></td>'
+      +'<td class="'+sevClass(r.sev)+'"><select class="'+sevClass(r.sev)+'" onchange="rows['+i+'].sev=this.value;render()">'
+      +['HIGH','MEDIUM','LOW','INFO'].map(function(s){return'<option'+(r.sev===s?' selected':'')+'>'+s+'</option>';}).join('')
+      +'</select></td>'
+      +'<td><input type="text" value="'+r.owner+'" onchange="rows['+i+'].owner=this.value"></td>'
+      +'<td><select class="'+statClass(r.status)+'" onchange="rows['+i+'].status=this.value;render()">'
+      +['OPEN','IN PROGRESS','RESOLVED'].map(function(s){return'<option'+(r.status===s?' selected':'')+'>'+s+'</option>';}).join('')
+      +'</select></td>'
+      +'<td><textarea class="notes-input" onchange="rows['+i+'].notes=this.value">'+r.notes+'</textarea></td>'
+      +'<td><button class="del-btn" onclick="rows.splice('+i+',1);render()">×</button></td>'
+      +'</tr>';
+  }).join('');
+  updateStats();
+}
+
+function addRow(){
+  var d=new Date().toISOString().split('T')[0];
+  rows.push({date:d,finding:"",host:"",sev:"MEDIUM",owner:"crooks",status:"OPEN",notes:""});
+  render();
+}
+
+function exportCSV(){
+  var lines=["Date,Finding,Host,Severity,Owner,Status,Notes"];
+  rows.forEach(function(r){
+    lines.push([r.date,'"'+r.finding+'"','"'+r.host+'"',r.sev,r.owner,r.status,'"'+r.notes+'"'].join(','));
+  });
+  download('McLoud_Remediation_Log.csv',lines.join('\n'),'text/csv');
+}
+
+function exportText(){
+  var lines=[
+    "REMEDIATION LOG — McLoud Public Schools",
+    "Enigma Labs LLC Cybersecurity Internship",
+    "Generated: "+new Date().toLocaleDateString(),
+    "=".repeat(80),
+    ""
+  ];
+  rows.forEach(function(r,i){
+    lines.push("["+(i+1)+"] "+r.sev+" | "+r.status+" | "+r.date+" | Owner: "+r.owner);
+    lines.push("    Finding: "+r.finding);
+    lines.push("    Host: "+r.host);
+    lines.push("    Notes: "+r.notes);
+    lines.push("");
+  });
+  download('McLoud_Remediation_Log.txt',lines.join('\n'),'text/plain');
+}
+
+function download(name,content,type){
+  var b=new Blob([content],{type:type});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download=name;
+  a.click();
+}
+
+document.getElementById('gen-date').textContent=new Date().toLocaleDateString();
+render();
+</script>
+</body>
+</html>

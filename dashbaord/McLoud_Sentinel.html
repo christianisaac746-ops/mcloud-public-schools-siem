@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>McLoud Public Schools — Security Operations Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red:      #CC0000;
+  --red-dim:  #8B0000;
+  --red-lt:   #FFF0F0;
+  --black:    #0D0D0D;
+  --dark:     #1A1A1A;
+  --mid:      #2A2A2A;
+  --border:   #E0E0E0;
+  --gray:     #888888;
+  --lt-gray:  #F4F4F4;
+  --white:    #FFFFFF;
+  --paper:    #FAFAF8;
+  --green:    #1A7A3A;
+  --green-lt: #E8F5E9;
+  --amber:    #B8860B;
+  --amber-lt: #FFFBEB;
+  --blue:     #1565C0;
+  --blue-lt:  #E8F0FE;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--paper);
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: var(--black);
+  min-height: 100vh;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--black);
+  border-bottom: 2px solid var(--red);
+  height: 48px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+
+.topbar-logo {
+  width: 26px; height: 22px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+.topbar-titles { line-height: 1.2; }
+
+.topbar-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: 0.05em;
+}
+
+.topbar-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gray);
+  letter-spacing: 0.06em;
+}
+
+.topbar-right { display: flex; align-items: center; gap: 20px; }
+
+.live-pill {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.live-pill.connected { color: var(--green); }
+.live-pill.demo { color: var(--amber); }
+
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  animation: blink 2s infinite;
+}
+.connected .live-dot { background: var(--green); }
+.demo .live-dot { background: var(--amber); }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.topbar-clock {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 16px;
+  color: var(--red);
+  letter-spacing: 0.1em;
+}
+
+/* ── NAV ── */
+.nav {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  gap: 0;
+  position: sticky;
+  top: 48px;
+  z-index: 99;
+}
+
+.nav-item {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  padding: 12px 18px;
+  color: var(--gray);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s;
+  text-transform: uppercase;
+}
+
+.nav-item:hover { color: var(--black); }
+.nav-item.active { color: var(--red); border-bottom-color: var(--red); }
+
+/* ── CONNECTION BANNER ── */
+.conn-banner {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  padding: 6px 24px;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid;
+}
+
+.conn-banner.live {
+  background: var(--green-lt);
+  color: var(--green);
+  border-color: #A5D6A7;
+}
+
+.conn-banner.demo {
+  background: var(--amber-lt);
+  color: var(--amber);
+  border-color: #FFE082;
+}
+
+/* ── CONTENT ── */
+.content { padding: 20px 24px; max-width: 1300px; margin: 0 auto; }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.page-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--black);
+  letter-spacing: -0.02em;
+}
+
+.page-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--gray);
+  margin-top: 3px;
+  letter-spacing: 0.04em;
+}
+
+.page-meta {
+  text-align: right;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--gray);
+}
+
+.page-meta .ts { color: var(--red); font-size: 13px; }
+
+/* ── STATS ROW ── */
+.stats {
+  display: grid;
+  grid-template-columns: 220px 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: start;
+}
+
+/* Gauge card */
+.gauge-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--red);
+  border-radius: 6px;
+  padding: 16px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gauge-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gray);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.gauge-wrap { position: relative; width: 160px; height: 88px; margin-bottom: 6px; }
+.gauge-svg { width: 160px; height: 88px; }
+
+.gauge-val {
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--red);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.gauge-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--red);
+  letter-spacing: 0.08em;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* Stat cards */
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--black);
+  border-radius: 6px;
+  padding: 16px 18px;
+}
+
+.stat-card.green-top { border-top-color: var(--green); }
+.stat-card.red-top { border-top-color: var(--red); }
+
+.stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gray);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.stat-val {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 32px;
+  color: var(--black);
+  line-height: 1;
+}
+
+.stat-val.red { color: var(--red); }
+.stat-val.green { color: var(--green); }
+
+.stat-change {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gray);
+  margin-top: 6px;
+}
+
+.stat-change.ok { color: var(--green); }
+.stat-change.warn { color: var(--amber); }
+
+/* ── GRID LAYOUTS ── */
+.grid-3-1 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sidebar { display: flex; flex-direction: column; gap: 12px; }
+
+/* ── PANELS ── */
+.panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.panel-head {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--lt-gray);
+}
+
+.panel-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--black);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.06em;
+}
+
+.badge-red   { background: var(--red-lt);   color: var(--red);   border: 1px solid #FFCDD2; }
+.badge-green { background: var(--green-lt); color: var(--green); border: 1px solid #A5D6A7; }
+.badge-amber { background: var(--amber-lt); color: var(--amber); border: 1px solid #FFE082; }
+.badge-gray  { background: var(--lt-gray);  color: var(--gray);  border: 1px solid var(--border); }
+.badge-blue  { background: var(--blue-lt);  color: var(--blue);  border: 1px solid #BBDEFB; }
+
+/* ── ALERT ROWS ── */
+.alert-row {
+  padding: 10px 16px;
+  border-bottom: 1px solid #F5F5F5;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.alert-row:last-child { border-bottom: none; }
+.alert-row:hover { background: var(--lt-gray); }
+
+.sev-bar {
+  width: 3px;
+  border-radius: 2px;
+  align-self: stretch;
+  flex-shrink: 0;
+  min-height: 38px;
+}
+
+.sev-high { background: var(--red); }
+.sev-med  { background: var(--amber); }
+.sev-low  { background: var(--green); }
+.sev-info { background: var(--blue); }
+
+.alert-body { flex: 1; min-width: 0; }
+
+.alert-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 2px;
+}
+
+.alert-detail {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--gray);
+}
+
+.alert-time {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gray);
+  margin-top: 2px;
+}
+
+/* ── SOURCE ROWS ── */
+.source-row {
+  padding: 10px 16px;
+  border-bottom: 1px solid #F5F5F5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.source-row:last-child { border-bottom: none; }
+
+.status-dot-green {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+  animation: blink 3s infinite;
+}
+
+.source-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--black);
+  flex: 1;
+}
+
+.source-bar-wrap { width: 80px; }
+
+.source-bar {
+  height: 3px;
+  background: #E0E0E0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.source-fill {
+  height: 100%;
+  background: var(--red);
+  border-radius: 2px;
+}
+
+.source-count {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  color: var(--red);
+  font-weight: 400;
+  min-width: 55px;
+  text-align: right;
+}
+
+/* ── RULE ROWS ── */
+.rule-row {
+  padding: 9px 16px;
+  border-bottom: 1px solid #F5F5F5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rule-row:last-child { border-bottom: none; }
+
+.rule-on {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: var(--green-lt);
+  color: var(--green);
+  border: 1px solid #A5D6A7;
+  flex-shrink: 0;
+}
+
+.rule-body { flex: 1; }
+
+.rule-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--black);
+  font-weight: 500;
+}
+
+.rule-query {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gray);
+  margin-top: 1px;
+}
+
+/* ── CAMPUS CARDS ── */
+.campus-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 14px 16px;
+}
+
+.campus-card {
+  background: var(--lt-gray);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--red);
+  border-radius: 4px;
+  padding: 12px;
+  text-align: center;
+}
+
+.campus-code {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 18px;
+  color: var(--red);
+  margin-bottom: 3px;
+}
+
+.campus-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gray);
+  line-height: 1.3;
+}
+
+.campus-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--black);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* ── INFRA BOX ── */
+.infra-box {
+  margin: 0 16px 14px;
+  padding: 12px 14px;
+  background: var(--lt-gray);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--black);
+  border-radius: 4px;
+}
+
+.infra-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gray);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.infra-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--black);
+  margin-bottom: 2px;
+}
+
+.infra-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gray);
+  margin-bottom: 1px;
+}
+
+.infra-live {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--green);
+  margin-top: 5px;
+}
+
+/* ── MINI CHART ── */
+.mini-chart { padding: 14px 16px; }
+.bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 56px; }
+.bar { flex: 1; background: #E0E0E0; border-radius: 2px 2px 0 0; }
+.bar.active { background: var(--red); }
+.chart-labels { display: flex; gap: 4px; margin-top: 4px; }
+.chart-label { flex: 1; text-align: center; font-family: 'IBM Plex Mono',monospace; font-size: 9px; color: var(--gray); }
+
+/* ── FOOTER ── */
+.footer {
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--gray);
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+}
+
+.footer span { color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-titles">
+      <div class="topbar-name">McLOUD PUBLIC SCHOOLS</div>
+      <div class="topbar-sub">SECURITY OPERATIONS CENTER &nbsp;·&nbsp; ENIGMA LABS LLC</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="live-pill demo" id="live-pill">
+      <div class="live-dot"></div>
+      <span id="live-label">CONNECTING...</span>
+    </div>
+    <div class="topbar-clock" id="clock">--:--:--</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-item active" onclick="switchTab('overview', this)">Overview</div>
+  <div class="nav-item" onclick="switchTab('alerts', this)">Alerts</div>
+  <div class="nav-item" onclick="switchTab('sources', this)">Log Sources</div>
+  <div class="nav-item" onclick="switchTab('detection', this)">Detection</div>
+  <div class="nav-item" onclick="switchTab('campuses', this)">Campuses</div>
+</div>
+
+<!-- CONNECTION BANNER -->
+<div class="conn-banner demo" id="conn-banner">
+  DEMO MODE — Connect to the McLoud ISD network to view live data from Graylog at 10.5.1.35
+</div>
+
+<!-- OVERVIEW TAB -->
+<div id="tab-overview" class="content">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Security Overview</div>
+      <div class="page-sub">MCLOUD.K12.OK.US &nbsp;·&nbsp; 4 CAMPUSES &nbsp;·&nbsp; SIEM OPERATIONAL</div>
+    </div>
+    <div class="page-meta">
+      <div style="font-size:10px; margin-bottom:2px;">LAST UPDATED</div>
+      <div class="ts" id="ts">--</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="gauge-card">
+      <div class="gauge-label">Active Alerts</div>
+      <div class="gauge-wrap">
+        <svg class="gauge-svg" viewBox="0 0 160 88">
+          <path d="M16,84 A64,64 0 0,1 144,84" fill="none" stroke="#E0E0E0" stroke-width="10" stroke-linecap="round"/>
+          <path d="M16,84 A64,64 0 0,1 144,84" fill="none" stroke="#CC0000" stroke-width="10" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="141"/>
+          <text x="16" y="96" fill="#888" font-size="9" font-family="IBM Plex Mono">0</text>
+          <text x="136" y="96" fill="#888" font-size="9" font-family="IBM Plex Mono">10</text>
+          <line id="needle" x1="80" y1="84" x2="80" y2="28" stroke="#CC0000" stroke-width="2.5" stroke-linecap="round" transform="rotate(-68 80 84)"/>
+          <circle cx="80" cy="84" r="5" fill="white" stroke="#CC0000" stroke-width="2"/>
+        </svg>
+        <div class="gauge-val" id="alert-val">3</div>
+      </div>
+      <div class="gauge-sub" id="alert-sub">+2 LAST HOUR</div>
+    </div>
+
+    <div class="stat-card red-top">
+      <div class="stat-label">Events Today</div>
+      <div class="stat-val red" id="val-events">56,906</div>
+      <div class="stat-change ok" id="events-sub">3 sources active</div>
+    </div>
+
+    <div class="stat-card green-top">
+      <div class="stat-label">Detection Rules</div>
+      <div class="stat-val green">7 / 7</div>
+      <div class="stat-change ok">All enabled · 60s interval</div>
+    </div>
+
+    <div class="stat-card green-top">
+      <div class="stat-label">Log Sources</div>
+      <div class="stat-val green" id="val-sources">3</div>
+      <div class="stat-change ok">Windows · GWS · Cisco</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="grid-3-1">
+    <!-- ALERTS PANEL -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Recent Alerts</div>
+        <div class="badge badge-red" id="alerts-badge">3 ACTIVE</div>
+      </div>
+      <div id="alerts-list">
+        <div class="alert-row">
+          <div class="sev-bar sev-high"></div>
+          <div class="alert-body">
+            <div class="alert-name">Brute Force — Windows Login</div>
+            <div class="alert-detail">fakeuser · Jflan-Desktop1 · count()=6</div>
+            <div class="alert-time">Today 14:07</div>
+          </div>
+          <div class="badge badge-red">HIGH</div>
+        </div>
+        <div class="alert-row">
+          <div class="sev-bar sev-med"></div>
+          <div class="alert-body">
+            <div class="alert-name">After Hours Authentication</div>
+            <div class="alert-detail">MPS-DC2 · count()=408 · Kerberos — Tuned</div>
+            <div class="alert-time">Today 16:21</div>
+          </div>
+          <div class="badge badge-amber">MEDIUM</div>
+        </div>
+        <div class="alert-row">
+          <div class="sev-bar sev-med"></div>
+          <div class="alert-body">
+            <div class="alert-name">Cisco Threshold Violation</div>
+            <div class="alert-detail">Twe1/0/2 · Rx power -14.1 dBm · Fiber SFP</div>
+            <div class="alert-time">Today 10:26 · Flagged to IT Director</div>
+          </div>
+          <div class="badge badge-amber">INFRA</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <!-- LOG SOURCES -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Log Sources</div>
+          <div class="badge badge-green" id="sources-badge">ALL LIVE</div>
+        </div>
+        <div class="source-row">
+          <div class="status-dot-green"></div>
+          <div class="source-name">Windows (Winlogbeat)</div>
+          <div class="source-bar-wrap"><div class="source-bar"><div class="source-fill" style="width:85%"></div></div></div>
+          <div class="source-count" id="win-count">48,200</div>
+        </div>
+        <div class="source-row">
+          <div class="status-dot-green"></div>
+          <div class="source-name">Google Workspace</div>
+          <div class="source-bar-wrap"><div class="source-bar"><div class="source-fill" style="width:55%"></div></div></div>
+          <div class="source-count" id="gws-count">7,743</div>
+        </div>
+        <div class="source-row">
+          <div class="status-dot-green"></div>
+          <div class="source-name">Cisco Syslog</div>
+          <div class="source-bar-wrap"><div class="source-bar"><div class="source-fill" style="width:8%"></div></div></div>
+          <div class="source-count" id="cisco-count">963</div>
+        </div>
+      </div>
+
+      <!-- EVENT VOLUME -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Event Volume</div>
+          <div class="badge badge-gray">24H</div>
+        </div>
+        <div class="mini-chart">
+          <div class="bar-chart" id="bars"></div>
+          <div class="chart-labels" id="bar-labels"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM GRID -->
+  <div class="grid-2">
+    <!-- DETECTION RULES -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Detection Rules</div>
+        <div class="badge badge-green">7 / 7 ACTIVE</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-on">ON</div>
+        <div class="rule-body">
+          <div class="rule-name">Brute Force — Windows Login</div>
+          <div class="rule-query">event_code:4625 · count()≥5/1min · group by username</div>
+        </div>
+        <div class="badge badge-red">HIGH</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-on">ON</div>
+        <div class="rule-body">
+          <div class="rule-name">Account Lockout</div>
+          <div class="rule-query">event_code:4740 · count()≥1/5min · group by username</div>
+        </div>
+        <div class="badge badge-red">HIGH</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-on">ON</div>
+        <div class="rule-body">
+          <div class="rule-name">After Hours Authentication</div>
+          <div class="rule-query">event_code:4624 · count()≥50/5min</div>
+        </div>
+        <div class="badge badge-amber">MED</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-on">ON</div>
+        <div class="rule-body">
+          <div class="rule-name">Privilege Escalation</div>
+          <div class="rule-query">event_code:4728 OR 4732 · count()≥1</div>
+        </div>
+        <div class="badge badge-red">HIGH</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-on">ON</div>
+        <div class="rule-body">
+          <div class="rule-name">GWS Login Failure</div>
+          <div class="rule-query">_application:login AND failure · count()≥3</div>
+        </div>
+        <div class="badge badge-red">HIGH</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-on">ON</div>
+        <div class="rule-body">
+          <div class="rule-name">GWS Admin Activity</div>
+          <div class="rule-query">_application:admin · count()≥1</div>
+        </div>
+        <div class="badge badge-red">HIGH</div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-on">ON</div>
+        <div class="rule-body">
+          <div class="rule-name">GWS Token Denied</div>
+          <div class="rule-query">_application:token AND deny · count()≥5</div>
+        </div>
+        <div class="badge badge-amber">MED</div>
+      </div>
+    </div>
+
+    <!-- CAMPUSES -->
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">District Campuses</div>
+        <div class="badge badge-green">4 MONITORED</div>
+      </div>
+      <div class="campus-grid">
+        <div class="campus-card">
+          <div class="campus-code">HSW</div>
+          <div class="campus-name">High School West</div>
+          <div class="campus-count">Gr. 9–12</div>
+        </div>
+        <div class="campus-card">
+          <div class="campus-code">HSE</div>
+          <div class="campus-name">High School East</div>
+          <div class="campus-count">Gr. 9–12</div>
+        </div>
+        <div class="campus-card">
+          <div class="campus-code">INT</div>
+          <div class="campus-name">Intermediate</div>
+          <div class="campus-count">Gr. 5–8</div>
+        </div>
+        <div class="campus-card">
+          <div class="campus-code">ECC</div>
+          <div class="campus-name">Early Childcare</div>
+          <div class="campus-count">Pre-K–4</div>
+        </div>
+      </div>
+      <div class="infra-box">
+        <div class="infra-label">SIEM Infrastructure</div>
+        <div class="infra-val">HomeLab1 · 10.5.1.35</div>
+        <div class="infra-sub">Graylog 6.1 · OpenSearch 2.x · MongoDB 6.0</div>
+        <div class="infra-sub">Ubuntu 24.10 · 22GB RAM · 382GB storage</div>
+        <div class="infra-live" id="uptime">Operational since April 20, 2026</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ALERTS TAB -->
+<div id="tab-alerts" class="content" style="display:none;">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Alerts &amp; Events</div>
+      <div class="page-sub">All detection rule triggers · Real-time from Graylog</div>
+    </div>
+    <a href="http://10.5.1.35:9000/#/alerts" target="_blank" style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--red); text-decoration:none; border:1px solid var(--red); padding:6px 14px; border-radius:4px;">Open in Graylog →</a>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><div class="panel-title">Recent Alert History</div><div class="badge badge-red">3 ACTIVE</div></div>
+    <div class="alert-row"><div class="sev-bar sev-high"></div><div class="alert-body"><div class="alert-name">Brute Force — Windows Login</div><div class="alert-detail">fakeuser · Jflan-Desktop1 · count()=6 · Event ID 4625</div><div class="alert-time">2026-04-27 14:07:16 · Confirmed end-to-end · Email delivered</div></div><div class="badge badge-red">HIGH</div></div>
+    <div class="alert-row"><div class="sev-bar sev-med"></div><div class="alert-body"><div class="alert-name">After Hours Authentication · count()=408</div><div class="alert-detail">MPS-DC2 · Investigated — machine accounts (Kerberos) · False positive · Rule tuned to ≥50</div><div class="alert-time">2026-04-27 16:21:53 · False Positive · Resolved</div></div><div class="badge badge-amber">MEDIUM</div></div>
+    <div class="alert-row"><div class="sev-bar sev-info"></div><div class="alert-body"><div class="alert-name">Cisco Threshold Violation — Fiber Optic</div><div class="alert-detail">Twe1/0/2 Rx -14.1 dBm · Twe1/0/9 Rx -17.5 dBm · SFP or cable issue</div><div class="alert-time">2026-04-27 · Flagged to IT Director · Infrastructure finding</div></div><div class="badge badge-blue">INFRA</div></div>
+  </div>
+</div>
+
+<!-- LOG SOURCES TAB -->
+<div id="tab-sources" class="content" style="display:none;">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Log Sources</div>
+      <div class="page-sub">Active inputs · Graylog 6.1</div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Windows Event Logs</div><div class="badge badge-green">LIVE</div></div>
+      <div style="padding:16px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gray); margin-bottom:8px;">INPUT: Beats · Port 5044 · Winlogbeat 8.13</div>
+        <div class="source-row" style="padding:8px 0;"><div class="status-dot-green"></div><div class="source-name">MPS-DC1.mcloud.k12.ok.us</div><div class="badge badge-green">ACTIVE</div></div>
+        <div class="source-row" style="padding:8px 0;"><div class="status-dot-green"></div><div class="source-name">MPS-DC3.mcloud.k12.ok.us</div><div class="badge badge-green">ACTIVE</div></div>
+        <div class="source-row" style="padding:8px 0;"><div class="status-dot-green"></div><div class="source-name">Jflan-Desktop1.mcloud.k12.ok.us</div><div class="badge badge-green">ACTIVE</div></div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--gray); margin-top:10px;">Stream: Windows Security Events · Filter: beats_type = winlogbeat</div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Google Workspace</div><div class="badge badge-green">LIVE</div></div>
+      <div style="padding:16px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gray); margin-bottom:8px;">INPUT: GELF HTTP · Port 12201 · Python · Cron */5 * * * *</div>
+        <div class="source-row" style="padding:8px 0;"><div class="status-dot-green"></div><div class="source-name">Login events</div><div class="badge badge-green">ACTIVE</div></div>
+        <div class="source-row" style="padding:8px 0;"><div class="status-dot-green"></div><div class="source-name">Admin console activity</div><div class="badge badge-green">ACTIVE</div></div>
+        <div class="source-row" style="padding:8px 0;"><div class="status-dot-green"></div><div class="source-name">Drive activity</div><div class="badge badge-green">ACTIVE</div></div>
+        <div class="source-row" style="padding:8px 0;"><div class="status-dot-green"></div><div class="source-name">OAuth token events</div><div class="badge badge-green">ACTIVE</div></div>
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--gray); margin-top:10px;">Service account: graylog-workspace-reader@mcloud-siem.iam.gserviceaccount.com</div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Cisco Network / Syslog</div><div class="badge badge-green">LIVE</div></div>
+      <div style="padding:16px;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gray); margin-bottom:8px;">INPUT: Syslog UDP · Port 514 · Cisco Switch 192.168.0.1</div>
+        <div class="source-row" style="padding:8px 0;"><div class="status-dot-green"></div><div class="source-name">Interface events</div><div class="badge badge-green">ACTIVE</div></div>
+        <div class="source-row" style="padding:8px 0;"><div class="status-dot-green"></div><div class="source-name">SFP / threshold alerts</div><div class="badge badge-green">ACTIVE</div></div>
+        <div style="background:var(--red-lt); border:1px solid #FFCDD2; border-left:3px solid var(--red); border-radius:4px; padding:10px 12px; margin-top:10px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--red);">⚠ Finding: Twe1/0/2 and Twe1/0/9 fiber optic threshold violations — flagged to IT Director</div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="panel-title">Planned Sources</div><div class="badge badge-gray">PENDING</div></div>
+      <div style="padding:16px;">
+        <div class="source-row" style="padding:8px 0;"><div style="width:7px;height:7px;border-radius:50%;background:#E0E0E0;flex-shrink:0;"></div><div class="source-name" style="color:var(--gray);">MPS-DC2 (Winlogbeat)</div><div class="badge badge-gray">PENDING</div></div>
+        <div class="source-row" style="padding:8px 0;"><div style="width:7px;height:7px;border-radius:50%;background:#E0E0E0;flex-shrink:0;"></div><div class="source-name" style="color:var(--gray);">Palo Alto Firewall (Syslog)</div><div class="badge badge-gray">PENDING</div></div>
+        <div class="source-row" style="padding:8px 0;"><div style="width:7px;height:7px;border-radius:50%;background:#E0E0E0;flex-shrink:0;"></div><div class="source-name" style="color:var(--gray);">HP iLO interfaces (Syslog)</div><div class="badge badge-gray">POST-PATCH</div></div>
+        <div class="source-row" style="padding:8px 0;"><div style="width:7px;height:7px;border-radius:50%;background:#E0E0E0;flex-shrink:0;"></div><div class="source-name" style="color:var(--gray);">GoGuardian (API — plan upgrade needed)</div><div class="badge badge-gray">FUTURE</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETECTION TAB -->
+<div id="tab-detection" class="content" style="display:none;">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Detection Rules</div>
+      <div class="page-sub">7 active rules · 60 second evaluation interval · Email: crooks@mcloudschools.us</div>
+    </div>
+    <a href="http://10.5.1.35:9000/#/alerts/definitions" target="_blank" style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--red); text-decoration:none; border:1px solid var(--red); padding:6px 14px; border-radius:4px;">Manage in Graylog →</a>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><div class="panel-title">Event Definitions</div><div class="badge badge-green">7 / 7 ENABLED</div></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
+      ${[
+        ["Brute Force — Windows Login","event_code:4625","count()≥5 per username / 1 min","Group by: TargetUserName","HIGH","badge-red"],
+        ["Account Lockout Detected","event_code:4740","count()≥1 per username / 5 min","Group by: TargetUserName","HIGH","badge-red"],
+        ["After Hours Authentication","event_code:4624","count()≥50 / 5 min","Outside 6AM–10PM","MEDIUM","badge-amber"],
+        ["Privilege Escalation","event_code:4728 OR 4732","count()≥1 / 5 min","Admin group changes","HIGH","badge-red"],
+        ["GWS Login Failure","_application:login AND failure","count()≥3 / 5 min","All Workspace accounts","HIGH","badge-red"],
+        ["GWS Admin Activity","_application:admin","count()≥1 / 5 min","Any admin console change","HIGH","badge-red"],
+        ["GWS Token Denied","_application:token AND deny","count()≥5 / 5 min","OAuth token rejections","MEDIUM","badge-amber"],
+      ].map(r=>`
+        <div style="padding:14px 16px; border-bottom:1px solid #F5F5F5; border-right:1px solid #F5F5F5;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; color:var(--black);">${r[0]}</div>
+            <div class="badge ${r[5]}">${r[4]}</div>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--red); margin-bottom:3px;">${r[1]}</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--gray);">${r[2]}</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--gray);">${r[3]}</div>
+        </div>
+      `).join('')}
+    </div>
+  </div>
+</div>
+
+<!-- CAMPUSES TAB -->
+<div id="tab-campuses" class="content" style="display:none;">
+  <div class="page-header">
+    <div>
+      <div class="page-title">District Campuses</div>
+      <div class="page-sub">McLoud Public Schools · McLoud, Oklahoma · MCLOUD.K12.OK.US</div>
+    </div>
+  </div>
+  <div class="grid-2">
+    ${[
+      ["HSW","High School West","Gr. 9–12","DATA-HSW · VLAN 401 · 10.4.0.0/24","55 hosts discovered","MPS-APPS (10.4.0.56) · FS-KEN (10.4.0.4) · HSW-RM35"],
+      ["HSE","High School East","Gr. 9–12","DATA-HSE · VLAN 402 · 10.4.2.0/24","Discovery scan pending","—"],
+      ["INT","Intermediate Campus","Gr. 5–8","DATA-INT · VLAN 504 · 10.5.4.0/24","Discovery scan pending","—"],
+      ["ECC","Early Childcare Center","Pre-K–4","DATA-ECC/MMC · VLAN 501 · 10.5.0.0/24","47 hosts discovered","ECC-DC (10.5.1.10) · ECC-LUNCHROOM-1 · Multiple staff PCs"],
+    ].map(r=>`
+      <div class="panel">
+        <div class="panel-head" style="border-left:4px solid var(--red);">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="font-family:'Share Tech Mono',monospace; font-size:22px; color:var(--red);">${r[0]}</div>
+            <div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; color:var(--black);">${r[1]}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--gray);">${r[2]}</div>
+            </div>
+          </div>
+          <div class="badge ${r[4].includes('pending') ? 'badge-amber' : 'badge-green'}">${r[4].includes('pending') ? 'PENDING' : 'SCANNED'}</div>
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gray); margin-bottom:6px;">${r[3]}</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--black); margin-bottom:4px;">${r[4]}</div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gray);">${r[5]}</div>
+        </div>
+      </div>
+    `).join('')}
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer" style="margin: 0 24px 0;">
+  McLoud Public Schools &nbsp;·&nbsp; <span>Enigma Labs LLC</span> &nbsp;·&nbsp; Security Operations Center &nbsp;·&nbsp; Shaping Minds, Forging Futures
+</div>
+
+<script>
+// ── CLOCK ────────────────────────────────────────────────────────────────────
+function tick() {
+  var t = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('clock').textContent = t;
+  document.getElementById('ts').textContent = t;
+}
+tick(); setInterval(tick, 1000);
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(name, el) {
+  document.querySelectorAll('[id^="tab-"]').forEach(function(t){ t.style.display='none'; });
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  document.getElementById('tab-' + name).style.display = 'block';
+  el.classList.add('active');
+}
+
+// ── NEEDLE ANIMATION (demo mode) ─────────────────────────────────────────────
+var angle = -68, dir = 1;
+setInterval(function() {
+  angle += dir * 0.5;
+  if (angle > -52 || angle < -84) dir *= -1;
+  var n = document.getElementById('needle');
+  if (n) n.setAttribute('transform', 'rotate(' + angle + ' 80 84)');
+}, 50);
+
+// ── EVENT COUNTER ─────────────────────────────────────────────────────────────
+var evCount = 56906;
+setInterval(function() {
+  evCount += Math.floor(Math.random() * 3);
+  var el = document.getElementById('val-events');
+  if (el) el.textContent = evCount.toLocaleString();
+}, 4000);
+
+// ── BAR CHART ────────────────────────────────────────────────────────────────
+var hours = ['06','08','10','12','14','16','18','20'];
+var vals  = [12,28,45,72,89,95,40,18];
+var mx    = Math.max.apply(null, vals);
+var barsEl   = document.getElementById('bars');
+var labelsEl = document.getElementById('bar-labels');
+hours.forEach(function(h, i) {
+  var b = document.createElement('div');
+  b.className = 'bar' + (i === 5 ? ' active' : '');
+  b.style.height = Math.round((vals[i]/mx)*56) + 'px';
+  barsEl.appendChild(b);
+  var l = document.createElement('div');
+  l.className = 'chart-label';
+  l.textContent = h;
+  labelsEl.appendChild(l);
+});
+
+// ── GRAYLOG API ───────────────────────────────────────────────────────────────
+var GRAYLOG = 'http://10.5.1.35:9000';
+var AUTH    = 'Basic ' + btoa('admin:Bitconnect1261');
+var HEADERS = { 'Authorization': AUTH, 'Accept': 'application/json', 'X-Requested-By': 'sentinel' };
+
+function setLive(live) {
+  var pill   = document.getElementById('live-pill');
+  var label  = document.getElementById('live-label');
+  var banner = document.getElementById('conn-banner');
+  if (live) {
+    pill.className   = 'live-pill connected';
+    label.textContent = 'LIVE';
+    banner.className  = 'conn-banner live';
+    banner.textContent = 'LIVE DATA — Connected to Graylog at 10.5.1.35 · Refreshing every 30 seconds';
+  } else {
+    pill.className   = 'live-pill demo';
+    label.textContent = 'DEMO MODE';
+    banner.className  = 'conn-banner demo';
+    banner.textContent = 'DEMO MODE — Connect to McLoud ISD network to view live data from 10.5.1.35';
+  }
+}
+
+function fetchData() {
+  Promise.all([
+    fetch(GRAYLOG + '/api/count/messages', { headers: HEADERS }),
+    fetch(GRAYLOG + '/api/events/events?page=1&per_page=3&sort_by=timestamp&sort_direction=desc', { headers: HEADERS }),
+    fetch(GRAYLOG + '/api/system/inputs', { headers: HEADERS }),
+  ]).then(function(responses) {
+    setLive(true);
+    responses[0].json().then(function(d) {
+      var el = document.getElementById('val-events');
+      if (el && d.count) el.textContent = d.count.toLocaleString();
+    });
+    responses[1].json().then(function(d) {
+      var events = d.events || [];
+      var el = document.getElementById('alert-val');
+      if (el) el.textContent = events.length;
+      var badge = document.getElementById('alerts-badge');
+      if (badge) badge.textContent = events.length + ' ACTIVE';
+      if (events.length > 0) {
+        var list = document.getElementById('alerts-list');
+        list.innerHTML = events.map(function(e) {
+          var ts = new Date(e.timestamp).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+          return '<div class="alert-row"><div class="sev-bar sev-high"></div><div class="alert-body"><div class="alert-name">' + (e.event_definition_id||'Alert') + '</div><div class="alert-detail">' + (e.message||'') + '</div><div class="alert-time">Today ' + ts + '</div></div><div class="badge badge-red">HIGH</div></div>';
+        }).join('');
+      }
+    });
+    responses[2].json().then(function(d) {
+      var inputs = d.inputs || [];
+      var running = inputs.filter(function(i){ return i.state === 'RUNNING'; }).length;
+      var el = document.getElementById('val-sources');
+      if (el) el.textContent = running;
+    });
+  }).catch(function() {
+    setLive(false);
+  });
+}
+
+fetchData();
+setInterval(fetchData, 30000);
+</script>
+</body>
+</html>

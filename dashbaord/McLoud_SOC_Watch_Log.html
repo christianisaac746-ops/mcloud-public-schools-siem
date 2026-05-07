@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>McLoud Public Schools — SOC Watch Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #CC0000;
+  --red-dim: #8B0000;
+  --red-lt: #FFF0F0;
+  --black: #0D0D0D;
+  --dark: #1A1A1A;
+  --mid: #2A2A2A;
+  --border: #333333;
+  --gray: #888888;
+  --lt-gray: #F4F4F4;
+  --white: #FFFFFF;
+  --green: #1A7A3A;
+  --green-lt: #E8F5E9;
+  --amber: #B8860B;
+  --amber-lt: #FFFBEB;
+  --paper: #FAFAF8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--paper);
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: var(--black);
+  min-height: 100vh;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  background: var(--black);
+  padding: 0 24px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 2px solid var(--red);
+}
+
+.topbar-left { display: flex; align-items: center; gap: 16px; }
+
+.logo-img { width: 28px; height: 24px; object-fit: contain; }
+
+.topbar-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: 0.05em;
+}
+
+.topbar-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--gray);
+  letter-spacing: 0.05em;
+}
+
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: #4CAF50;
+}
+
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4CAF50;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.clock {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 16px;
+  color: var(--red);
+  letter-spacing: 0.1em;
+}
+
+/* ── CONTENT ── */
+.content { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+
+/* ── LOG HEADER ── */
+.log-header {
+  background: var(--white);
+  border: 1px solid #E0E0E0;
+  border-top: 4px solid var(--red);
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.log-field label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gray);
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.log-field input, .log-field select {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--black);
+  border: none;
+  border-bottom: 1px solid #E0E0E0;
+  background: transparent;
+  width: 100%;
+  padding: 4px 0;
+  outline: none;
+}
+
+.log-field input:focus, .log-field select:focus {
+  border-bottom-color: var(--red);
+}
+
+/* ── WATCH SECTIONS ── */
+.watch-section {
+  background: var(--white);
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.watch-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--black);
+  cursor: pointer;
+  user-select: none;
+}
+
+.watch-header.morning { background: #1A1A2E; }
+.watch-header.midday { background: #1A2E1A; }
+.watch-header.eod { background: #2E1A1A; }
+
+.watch-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.watch-time {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: var(--gray);
+}
+
+.watch-status {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.status-pending { background: #333; color: var(--gray); }
+.status-normal { background: var(--green-lt); color: var(--green); border: 1px solid #A5D6A7; }
+.status-anomaly { background: var(--red-lt); color: var(--red); border: 1px solid #FFCDD2; }
+.status-complete { background: var(--green-lt); color: var(--green); border: 1px solid #A5D6A7; }
+
+.watch-body { padding: 16px 20px; }
+
+/* ── CHECK ITEMS ── */
+.check-group { margin-bottom: 16px; }
+
+.check-group-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--red);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #F0F0F0;
+}
+
+.check-item {
+  display: grid;
+  grid-template-columns: 24px 1fr 100px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 8px 0;
+  border-bottom: 1px solid #F8F8F8;
+}
+
+.check-item:last-child { border-bottom: none; }
+
+.check-box {
+  width: 18px; height: 18px;
+  border: 1.5px solid #CCCCCC;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all 0.15s;
+}
+
+.check-box.checked {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+  font-size: 11px;
+}
+
+.check-label {
+  font-size: 13px;
+  color: var(--black);
+  line-height: 1.4;
+}
+
+.check-label small {
+  display: block;
+  font-size: 11px;
+  color: var(--gray);
+  font-family: 'IBM Plex Mono', monospace;
+  margin-top: 2px;
+}
+
+.check-result {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+}
+
+.check-result select {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  border: 1px solid #E0E0E0;
+  border-radius: 3px;
+  padding: 3px 6px;
+  background: var(--white);
+  width: 100%;
+}
+
+.check-notes input {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  border: none;
+  border-bottom: 1px solid #E0E0E0;
+  background: transparent;
+  width: 100%;
+  padding: 3px 0;
+  outline: none;
+  color: var(--black);
+}
+
+.check-notes input::placeholder { color: #CCCCCC; }
+.check-notes input:focus { border-bottom-color: var(--red); }
+
+/* ── ANOMALY BOX ── */
+.anomaly-box {
+  background: var(--red-lt);
+  border: 1px solid #FFCDD2;
+  border-left: 4px solid var(--red);
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin-top: 12px;
+}
+
+.anomaly-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--red);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.anomaly-field {
+  margin-bottom: 8px;
+}
+
+.anomaly-field label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gray);
+  display: block;
+  margin-bottom: 3px;
+}
+
+.anomaly-field input, .anomaly-field textarea, .anomaly-field select {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  border: 1px solid #FFCDD2;
+  border-radius: 3px;
+  background: var(--white);
+  width: 100%;
+  padding: 5px 8px;
+  outline: none;
+  color: var(--black);
+}
+
+.anomaly-field textarea { min-height: 60px; resize: vertical; }
+.anomaly-field input:focus, .anomaly-field textarea:focus { border-color: var(--red); }
+
+.add-anomaly-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--red);
+  background: none;
+  border: 1px solid var(--red);
+  border-radius: 3px;
+  padding: 4px 12px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.add-anomaly-btn:hover { background: var(--red-lt); }
+
+/* ── SIGN-OFF ── */
+.signoff {
+  background: var(--white);
+  border: 1px solid #E0E0E0;
+  border-top: 3px solid var(--black);
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  align-items: end;
+}
+
+.signoff-field label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gray);
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.signoff-field input {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  border: none;
+  border-bottom: 2px solid var(--black);
+  width: 100%;
+  padding: 4px 0;
+  background: transparent;
+  outline: none;
+}
+
+.sign-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  width: 100%;
+}
+
+.sign-btn:hover { background: var(--red); }
+
+/* ── TOOLBAR ── */
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.tool-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid #E0E0E0;
+  background: var(--white);
+  color: var(--black);
+  cursor: pointer;
+}
+
+.tool-btn:hover { background: var(--lt-gray); }
+.tool-btn.red { border-color: var(--red); color: var(--red); }
+.tool-btn.red:hover { background: var(--red-lt); }
+.tool-btn.dark { background: var(--black); color: var(--white); border-color: var(--black); }
+.tool-btn.dark:hover { background: var(--red); border-color: var(--red); }
+
+/* ── LOG HISTORY ── */
+.history-section {
+  background: var(--white);
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.history-header {
+  padding: 12px 20px;
+  background: var(--lt-gray);
+  border-bottom: 1px solid #E0E0E0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--black);
+  letter-spacing: 0.05em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-row {
+  display: grid;
+  grid-template-columns: 110px 90px 80px 1fr 80px;
+  gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #F5F5F5;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  align-items: center;
+}
+
+.history-row:last-child { border-bottom: none; }
+.history-row:hover { background: #FAFAFA; }
+
+.hist-date { color: var(--gray); }
+.hist-analyst { color: var(--black); font-weight: 500; }
+.hist-status-normal { color: var(--green); font-weight: 600; }
+.hist-status-anomaly { color: var(--red); font-weight: 600; }
+.hist-notes { color: var(--black); }
+.hist-sig { color: var(--gray); font-style: italic; }
+
+/* ── GRAYLOG QUERIES BOX ── */
+.queries-box {
+  background: var(--black);
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+.queries-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--red);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.query-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #222;
+}
+
+.query-item:last-child { border-bottom: none; }
+
+.query-label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12px;
+  color: #AAAAAA;
+  margin-bottom: 3px;
+}
+
+.query-code {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: #00FF88;
+  letter-spacing: 0.02em;
+}
+
+.query-link {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--gray);
+  text-decoration: none;
+  border: 1px solid #333;
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.query-link:hover { border-color: var(--red); color: var(--red); }
+
+/* ── FOOTER ── */
+.footer {
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--gray);
+  padding: 20px 0;
+}
+
+.footer span { color: var(--red); }
+
+/* ── PRINT ── */
+@media print {
+  .topbar { position: relative; }
+  .toolbar { display: none; }
+  .queries-box { display: none; }
+  .watch-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { background: white; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div>
+      <div class="topbar-title">McLOUD PUBLIC SCHOOLS</div>
+      <div class="topbar-sub">SOC WATCH LOG &nbsp;·&nbsp; ENIGMA LABS LLC</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="live-indicator"><div class="live-dot"></div>WATCH ACTIVE</div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- LOG HEADER -->
+  <div class="log-header">
+    <div class="log-field">
+      <label>Log Date</label>
+      <input type="date" id="log-date">
+    </div>
+    <div class="log-field">
+      <label>Watch Officer</label>
+      <input type="text" id="analyst" value="Christian Rooks" placeholder="Analyst name">
+    </div>
+    <div class="log-field">
+      <label>Watch Period</label>
+      <input type="text" value="0730 – 1630" readonly style="color:#888;">
+    </div>
+    <div class="log-field">
+      <label>Overall Status</label>
+      <select id="overall-status">
+        <option value="normal">NORMAL — No anomalies</option>
+        <option value="anomaly">ANOMALY — See notes</option>
+        <option value="incident">INCIDENT — Active response</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- GRAYLOG QUICK QUERIES -->
+  <div class="queries-box">
+    <div class="queries-title">⬛ Graylog Quick Queries — Run These Each Check</div>
+    <div class="query-item">
+      <div>
+        <div class="query-label">Failed logins — last 24h</div>
+        <div class="query-code">winlogbeat_event_code:4625</div>
+      </div>
+      <a class="query-link" href="http://10.5.1.35:9000" target="_blank">Open Graylog →</a>
+    </div>
+    <div class="query-item">
+      <div>
+        <div class="query-label">Account lockouts — last 24h</div>
+        <div class="query-code">winlogbeat_event_code:4740</div>
+      </div>
+      <a class="query-link" href="http://10.5.1.35:9000" target="_blank">Open Graylog →</a>
+    </div>
+    <div class="query-item">
+      <div>
+        <div class="query-label">Privilege escalation — group changes</div>
+        <div class="query-code">winlogbeat_event_code:4728 OR winlogbeat_event_code:4732</div>
+      </div>
+      <a class="query-link" href="http://10.5.1.35:9000" target="_blank">Open Graylog →</a>
+    </div>
+    <div class="query-item">
+      <div>
+        <div class="query-label">New user accounts created</div>
+        <div class="query-code">winlogbeat_event_code:4720</div>
+      </div>
+      <a class="query-link" href="http://10.5.1.35:9000" target="_blank">Open Graylog →</a>
+    </div>
+    <div class="query-item">
+      <div>
+        <div class="query-label">After hours logins — check for unusual accounts</div>
+        <div class="query-code">winlogbeat_event_code:4624</div>
+      </div>
+      <a class="query-link" href="http://10.5.1.35:9000" target="_blank">Open Graylog →</a>
+    </div>
+    <div class="query-item">
+      <div>
+        <div class="query-label">Google Workspace admin changes</div>
+        <div class="query-code">_application:admin</div>
+      </div>
+      <a class="query-link" href="http://10.5.1.35:9000" target="_blank">Open Graylog →</a>
+    </div>
+    <div class="query-item">
+      <div>
+        <div class="query-label">Cisco syslog — network events</div>
+        <div class="query-code">gl2_source_input:*</div>
+      </div>
+      <a class="query-link" href="http://10.5.1.35:9000" target="_blank">Open Graylog →</a>
+    </div>
+  </div>
+
+  <!-- MORNING WATCH -->
+  <div class="watch-section">
+    <div class="watch-header morning" onclick="toggleSection('morning')">
+      <div class="watch-title">
+        ◈ MORNING WATCH
+        <span class="watch-time">0730 – 0800</span>
+      </div>
+      <div class="watch-status status-pending" id="morning-status">PENDING</div>
+    </div>
+    <div class="watch-body" id="morning-body">
+
+      <div class="check-group">
+        <div class="check-group-title">Graylog System Health</div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">Graylog web UI accessible
+            <small>http://10.5.1.35:9000 — all 3 services green</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Notes..."></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">Message throughput normal
+            <small>Check top-right counter — consistent with yesterday</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Event count:"></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">All 3 inputs running
+            <small>System → Inputs — Beats :5044, GELF :12201, Syslog :514</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Notes..."></div>
+        </div>
+      </div>
+
+      <div class="check-group">
+        <div class="check-group-title">Overnight Alerts Review</div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">Check Alerts → Alerts &amp; Events
+            <small>Review all alerts since yesterday 1630 — investigate any anomalies</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Alert count:"></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">Check email inbox for alert notifications
+            <small>crooks@mcloudschools.us — any [GRAYLOG ALERT] emails overnight</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Email count:"></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">Search: failed logins overnight
+            <small>winlogbeat_event_code:4625 — last 12h — any brute force patterns?</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Count / accounts:"></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">Search: account lockouts overnight
+            <small>winlogbeat_event_code:4740 — same account locking out repeatedly?</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Count / accounts:"></div>
+        </div>
+      </div>
+
+      <div class="check-group">
+        <div class="check-group-title">Windows Domain Health</div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">MPS-DC1 sending logs
+            <small>Search source:MPS-DC1 — events in last hour?</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Notes..."></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">MPS-DC3 sending logs
+            <small>Search source:MPS-DC3 — events in last hour?</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Notes..."></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">Search: new admin accounts created
+            <small>winlogbeat_event_code:4720 — any unexpected new accounts?</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Count:"></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">Search: privilege escalation events
+            <small>winlogbeat_event_code:4728 OR 4732 — anyone added to admin groups?</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Notes..."></div>
+        </div>
+      </div>
+
+      <div class="check-group">
+        <div class="check-group-title">Google Workspace</div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">GWS logs flowing — check GELF input
+            <small>Recent events from Google Workspace in last 15 minutes?</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Notes..."></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">Search: GWS admin console changes
+            <small>_application:admin — any overnight admin changes?</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Notes..."></div>
+        </div>
+      </div>
+
+      <div class="check-group">
+        <div class="check-group-title">Network / Cisco</div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'morning')">✓</div>
+          <div class="check-label">Cisco syslog — any new threshold violations
+            <small>SFF8472 or THRESHOLD_VIOLATION — fiber optic / hardware warnings</small>
+          </div>
+          <div class="check-result">
+            <select>
+              <option>Normal</option>
+              <option>Anomaly</option>
+              <option>N/A</option>
+            </select>
+          </div>
+          <div class="check-notes"><input type="text" placeholder="Notes..."></div>
+        </div>
+      </div>
+
+      <button class="add-anomaly-btn" onclick="addAnomaly('morning-anomalies')">+ Log Anomaly</button>
+      <div id="morning-anomalies"></div>
+
+      <div style="margin-top:16px; padding-top:12px; border-top:1px solid #F0F0F0; display:flex; gap:12px; align-items:center;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gray);">WATCH COMPLETE:</div>
+        <input type="time" id="morning-complete-time" style="font-family:'IBM Plex Mono',monospace; font-size:12px; border:1px solid #E0E0E0; border-radius:3px; padding:3px 8px;">
+        <button class="tool-btn dark" style="font-size:11px; padding:5px 14px;" onclick="completeWatch('morning')">Mark Morning Watch Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MIDDAY WATCH -->
+  <div class="watch-section">
+    <div class="watch-header midday" onclick="toggleSection('midday')">
+      <div class="watch-title">
+        ◈ MIDDAY WATCH
+        <span class="watch-time">1200 – 1215</span>
+      </div>
+      <div class="watch-status status-pending" id="midday-status">PENDING</div>
+    </div>
+    <div class="watch-body" id="midday-body" style="display:none;">
+
+      <div class="check-group">
+        <div class="check-group-title">Quick Health Check</div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'midday')">✓</div>
+          <div class="check-label">Graylog still receiving events
+            <small>Message counter increasing normally — all inputs green</small>
+          </div>
+          <div class="check-result"><select><option>Normal</option><option>Anomaly</option><option>N/A</option></select></div>
+          <div class="check-notes"><input type="text" placeholder="Event count:"></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'midday')">✓</div>
+          <div class="check-label">Alerts &amp; Events — any new alerts since morning
+            <small>Anything fire in the last 4 hours worth investigating?</small>
+          </div>
+          <div class="check-result"><select><option>Normal</option><option>Anomaly</option><option>N/A</option></select></div>
+          <div class="check-notes"><input type="text" placeholder="Alert count:"></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'midday')">✓</div>
+          <div class="check-label">Search: failed logins since 0800
+            <small>winlogbeat_event_code:4625 — last 4h — any spike?</small>
+          </div>
+          <div class="check-result"><select><option>Normal</option><option>Anomaly</option><option>N/A</option></select></div>
+          <div class="check-notes"><input type="text" placeholder="Count:"></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'midday')">✓</div>
+          <div class="check-label">GoGuardian — check Smart Alerts panel
+            <small>admin.goguardian.com — any student safety flags this morning?</small>
+          </div>
+          <div class="check-result"><select><option>Normal</option><option>Anomaly</option><option>N/A</option></select></div>
+          <div class="check-notes"><input type="text" placeholder="Flag count:"></div>
+        </div>
+      </div>
+
+      <button class="add-anomaly-btn" onclick="addAnomaly('midday-anomalies')">+ Log Anomaly</button>
+      <div id="midday-anomalies"></div>
+
+      <div style="margin-top:16px; padding-top:12px; border-top:1px solid #F0F0F0; display:flex; gap:12px; align-items:center;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gray);">WATCH COMPLETE:</div>
+        <input type="time" id="midday-complete-time" style="font-family:'IBM Plex Mono',monospace; font-size:12px; border:1px solid #E0E0E0; border-radius:3px; padding:3px 8px;">
+        <button class="tool-btn dark" style="font-size:11px; padding:5px 14px;" onclick="completeWatch('midday')">Mark Midday Watch Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- END OF DAY WATCH -->
+  <div class="watch-section">
+    <div class="watch-header eod" onclick="toggleSection('eod')">
+      <div class="watch-title">
+        ◈ END OF DAY WATCH
+        <span class="watch-time">1600 – 1630</span>
+      </div>
+      <div class="watch-status status-pending" id="eod-status">PENDING</div>
+    </div>
+    <div class="watch-body" id="eod-body" style="display:none;">
+
+      <div class="check-group">
+        <div class="check-group-title">Daily Summary Review</div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'eod')">✓</div>
+          <div class="check-label">Total events today vs yesterday
+            <small>Set time range to Today — is volume within normal range?</small>
+          </div>
+          <div class="check-result"><select><option>Normal</option><option>Anomaly</option><option>N/A</option></select></div>
+          <div class="check-notes"><input type="text" placeholder="Today's count:"></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'eod')">✓</div>
+          <div class="check-label">All alerts today reviewed and documented
+            <small>Every alert in Alerts &amp; Events should have a resolution note</small>
+          </div>
+          <div class="check-result"><select><option>Normal</option><option>Anomaly</option><option>N/A</option></select></div>
+          <div class="check-notes"><input type="text" placeholder="Total alerts today:"></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'eod')">✓</div>
+          <div class="check-label">Search: account lockouts today
+            <small>winlogbeat_event_code:4740 — last 8h — any repeated lockouts?</small>
+          </div>
+          <div class="check-result"><select><option>Normal</option><option>Anomaly</option><option>N/A</option></select></div>
+          <div class="check-notes"><input type="text" placeholder="Count / accounts:"></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'eod')">✓</div>
+          <div class="check-label">Search: GWS login failures today
+            <small>_application:login AND _event_name:login_failure — last 8h</small>
+          </div>
+          <div class="check-result"><select><option>Normal</option><option>Anomaly</option><option>N/A</option></select></div>
+          <div class="check-notes"><input type="text" placeholder="Count:"></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'eod')">✓</div>
+          <div class="check-label">Cisco syslog — any new hardware warnings today
+            <small>Check for SFF8472 threshold violations or interface errors</small>
+          </div>
+          <div class="check-result"><select><option>Normal</option><option>Anomaly</option><option>N/A</option></select></div>
+          <div class="check-notes"><input type="text" placeholder="Notes..."></div>
+        </div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'eod')">✓</div>
+          <div class="check-label">GoGuardian Audit Log — any admin policy changes today
+            <small>admin.goguardian.com/audit-log — any unexpected filter overrides?</small>
+          </div>
+          <div class="check-result"><select><option>Normal</option><option>Anomaly</option><option>N/A</option></select></div>
+          <div class="check-notes"><input type="text" placeholder="Notes..."></div>
+        </div>
+      </div>
+
+      <div class="check-group">
+        <div class="check-group-title">Remediation Tracking</div>
+        <div class="check-item">
+          <div class="check-box" onclick="toggleCheck(this, 'eod')">✓</div>
+          <div class="check-label">Any remediation items progressed today?
+            <small>IPMI isolation, TLS fixes, SMB signing — update remediation log</small>
+          </div>
+          <div class="check-result"><select><option>Normal</option><option>N/A</option><option>Updated</option></select></div>
+          <div class="check-notes"><input type="text" placeholder="What was done:"></div>
+        </div>
+      </div>
+
+      <button class="add-anomaly-btn" onclick="addAnomaly('eod-anomalies')">+ Log Anomaly</button>
+      <div id="eod-anomalies"></div>
+
+      <div style="margin-top:16px; padding-top:12px; border-top:1px solid #F0F0F0; display:flex; gap:12px; align-items:center;">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gray);">WATCH COMPLETE:</div>
+        <input type="time" id="eod-complete-time" style="font-family:'IBM Plex Mono',monospace; font-size:12px; border:1px solid #E0E0E0; border-radius:3px; padding:3px 8px;">
+        <button class="tool-btn dark" style="font-size:11px; padding:5px 14px;" onclick="completeWatch('eod')">Mark EOD Watch Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGN OFF -->
+  <div class="signoff">
+    <div class="signoff-field">
+      <label>Watch Officer Signature</label>
+      <input type="text" id="sig-name" placeholder="Christian Rooks">
+    </div>
+    <div class="signoff-field">
+      <label>Time Signed</label>
+      <input type="time" id="sig-time">
+    </div>
+    <button class="sign-btn" onclick="signLog()">SIGN AND CLOSE WATCH</button>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <button class="tool-btn dark" onclick="newLog()">+ New Day Log</button>
+    <button class="tool-btn red" onclick="saveLog()">Save Log</button>
+    <button class="tool-btn red" onclick="exportLog()">Export as Text</button>
+    <button class="tool-btn" onclick="window.print()">Print Log</button>
+    <button class="tool-btn" onclick="loadHistory()">View History</button>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="history-section" id="history-section" style="display:none;">
+    <div class="history-header">
+      <span>WATCH LOG HISTORY</span>
+      <span style="font-weight:400; color:var(--gray);" id="history-count"></span>
+    </div>
+    <div style="padding:0;">
+      <div class="history-row" style="background:#F5F5F5; font-weight:600; font-size:11px; color:#888;">
+        <div>DATE</div><div>ANALYST</div><div>STATUS</div><div>NOTES</div><div>SIGNED</div>
+      </div>
+      <div id="history-rows"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    McLoud Public Schools &nbsp;·&nbsp; <span>Enigma Labs LLC</span> &nbsp;·&nbsp; SOC Watch Log &nbsp;·&nbsp; Shaping Minds, Forging Futures
+  </div>
+
+</div>
+
+<script>
+// ── CLOCK ────────────────────────────────────────────────────────────────────
+function updateClock() {
+  var now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ── SET DEFAULT DATE ──────────────────────────────────────────────────────────
+document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+
+// ── TOGGLE SECTIONS ───────────────────────────────────────────────────────────
+function toggleSection(id) {
+  var body = document.getElementById(id + '-body');
+  body.style.display = body.style.display === 'none' ? 'block' : 'none';
+}
+
+// ── CHECKBOX ─────────────────────────────────────────────────────────────────
+function toggleCheck(el, watch) {
+  el.classList.toggle('checked');
+  updateWatchProgress(watch);
+}
+
+function updateWatchProgress(watch) {
+  var section = document.getElementById(watch + '-body');
+  if (!section) return;
+  var boxes = section.querySelectorAll('.check-box');
+  var checked = section.querySelectorAll('.check-box.checked');
+  var statusEl = document.getElementById(watch + '-status');
+  var pct = boxes.length > 0 ? Math.round((checked.length / boxes.length) * 100) : 0;
+  if (pct === 100) {
+    statusEl.textContent = 'COMPLETE';
+    statusEl.className = 'watch-status status-complete';
+  } else if (pct > 0) {
+    statusEl.textContent = pct + '% DONE';
+    statusEl.className = 'watch-status status-pending';
+    statusEl.style.color = '#E67E22';
+  }
+}
+
+// ── ANOMALY ───────────────────────────────────────────────────────────────────
+function addAnomaly(containerId) {
+  var container = document.getElementById(containerId);
+  var box = document.createElement('div');
+  box.className = 'anomaly-box';
+  box.style.marginTop = '12px';
+  box.innerHTML = `
+    <div class="anomaly-title">⚠ ANOMALY / INCIDENT LOG ENTRY</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:10px;">
+      <div class="anomaly-field">
+        <label>Time Detected</label>
+        <input type="time">
+      </div>
+      <div class="anomaly-field">
+        <label>Severity</label>
+        <select>
+          <option>LOW — Informational</option>
+          <option>MEDIUM — Investigate</option>
+          <option>HIGH — Immediate action</option>
+          <option>CRITICAL — Escalate now</option>
+        </select>
+      </div>
+      <div class="anomaly-field">
+        <label>Source</label>
+        <select>
+          <option>Windows / Active Directory</option>
+          <option>Google Workspace</option>
+          <option>Cisco / Network</option>
+          <option>GoGuardian</option>
+          <option>Email Alert</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="anomaly-field">
+      <label>Description — What was observed?</label>
+      <textarea placeholder="Describe what you saw in Graylog or the alert that fired..."></textarea>
+    </div>
+    <div class="anomaly-field">
+      <label>Investigation — What did you find?</label>
+      <textarea placeholder="What accounts, IPs, or systems were involved? What queries did you run?"></textarea>
+    </div>
+    <div class="anomaly-field">
+      <label>Action Taken</label>
+      <textarea placeholder="What did you do? (e.g. determined false positive — rule tuned, escalated to IT director, account disabled, etc.)"></textarea>
+    </div>
+    <div class="anomaly-field">
+      <label>Resolution / Status</label>
+      <select>
+        <option>False Positive — No action required</option>
+        <option>True Positive — Resolved</option>
+        <option>True Positive — Ongoing investigation</option>
+        <option>Escalated to IT Director</option>
+        <option>Escalated to external party</option>
+      </select>
+    </div>
+  `;
+  container.appendChild(box);
+}
+
+// ── COMPLETE WATCH ────────────────────────────────────────────────────────────
+function completeWatch(watch) {
+  var timeEl = document.getElementById(watch + '-complete-time');
+  if (!timeEl.value) {
+    var now = new Date();
+    timeEl.value = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  }
+  var statusEl = document.getElementById(watch + '-status');
+  var anomalies = document.getElementById(watch + '-anomalies');
+  var hasAnomalies = anomalies && anomalies.children.length > 0;
+  statusEl.textContent = hasAnomalies ? 'ANOMALY LOGGED' : 'COMPLETE — NORMAL';
+  statusEl.className = hasAnomalies ? 'watch-status status-anomaly' : 'watch-status status-normal';
+}
+
+// ── SIGN LOG ──────────────────────────────────────────────────────────────────
+function signLog() {
+  var name = document.getElementById('sig-name').value || 'Christian Rooks';
+  var timeEl = document.getElementById('sig-time');
+  if (!timeEl.value) {
+    var now = new Date();
+    timeEl.value = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  }
+  saveLog();
+  alert('Watch log signed by ' + name + ' at ' + timeEl.value + '. Log saved.');
+}
+
+// ── SAVE / LOAD ───────────────────────────────────────────────────────────────
+function saveLog() {
+  var entry = {
+    date: document.getElementById('log-date').value,
+    analyst: document.getElementById('analyst').value,
+    status: document.getElementById('overall-status').value,
+    morningStatus: document.getElementById('morning-status').textContent,
+    middayStatus: document.getElementById('midday-status').textContent,
+    eodStatus: document.getElementById('eod-status').textContent,
+    sig: document.getElementById('sig-name').value,
+    sigTime: document.getElementById('sig-time').value,
+    saved: new Date().toISOString()
+  };
+  var history = JSON.parse(localStorage.getItem('soc-log-history') || '[]');
+  var existing = history.findIndex(function(h){ return h.date === entry.date; });
+  if (existing >= 0) history[existing] = entry;
+  else history.unshift(entry);
+  localStorage.setItem('soc-log-history', JSON.stringify(history.slice(0, 90)));
+}
+
+function loadHistory() {
+  var section = document.getElementById('history-section');
+  section.style.display = section.style.display === 'none' ? 'block' : 'none';
+  var history = JSON.parse(localStorage.getItem('soc-log-history') || '[]');
+  document.getElementById('history-count').textContent = history.length + ' entries';
+  var rows = document.getElementById('history-rows');
+  if (history.length === 0) {
+    rows.innerHTML = '<div style="padding:16px 20px; font-family:IBM Plex Mono,monospace; font-size:12px; color:#888;">No log history yet. Complete and sign your first watch to start building history.</div>';
+    return;
+  }
+  rows.innerHTML = history.map(function(h) {
+    var isAnomaly = h.status === 'anomaly' || h.status === 'incident';
+    return '<div class="history-row">'
+      + '<div class="hist-date">' + h.date + '</div>'
+      + '<div class="hist-analyst">' + (h.analyst||'—') + '</div>'
+      + '<div class="' + (isAnomaly ? 'hist-status-anomaly' : 'hist-status-normal') + '">'
+      + (isAnomaly ? '⚠ ANOMALY' : '✓ NORMAL') + '</div>'
+      + '<div class="hist-notes">'
+      + 'AM:' + (h.morningStatus||'—') + ' · MID:' + (h.middayStatus||'—') + ' · EOD:' + (h.eodStatus||'—')
+      + '</div>'
+      + '<div class="hist-sig">' + (h.sig||'—') + ' ' + (h.sigTime||'') + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+// ── NEW LOG ───────────────────────────────────────────────────────────────────
+function newLog() {
+  if (!confirm('Start a new day log? This will clear the current log.')) return;
+  document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('overall-status').value = 'normal';
+  document.getElementById('sig-name').value = '';
+  document.getElementById('sig-time').value = '';
+  ['morning','midday','eod'].forEach(function(w) {
+    document.getElementById(w + '-status').textContent = 'PENDING';
+    document.getElementById(w + '-status').className = 'watch-status status-pending';
+    document.querySelectorAll('#' + w + '-body .check-box').forEach(function(b){ b.classList.remove('checked'); });
+    document.querySelectorAll('#' + w + '-body input[type=text]').forEach(function(i){ i.value = ''; });
+    document.querySelectorAll('#' + w + '-body select').forEach(function(s){ s.selectedIndex = 0; });
+    var anomalies = document.getElementById(w + '-anomalies');
+    if (anomalies) anomalies.innerHTML = '';
+  });
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+function exportLog() {
+  var date = document.getElementById('log-date').value;
+  var analyst = document.getElementById('analyst').value;
+  var status = document.getElementById('overall-status').options[document.getElementById('overall-status').selectedIndex].text;
+  var lines = [
+    '=' .repeat(60),
+    'McLOUD PUBLIC SCHOOLS — SOC WATCH LOG',
+    'Enigma Labs LLC Cybersecurity Internship',
+    '=' .repeat(60),
+    'Date:     ' + date,
+    'Analyst:  ' + analyst,
+    'Period:   0730 – 1630',
+    'Status:   ' + status,
+    '—'.repeat(60),
+    'Morning Watch:  ' + document.getElementById('morning-status').textContent,
+    'Midday Watch:   ' + document.getElementById('midday-status').textContent,
+    'EOD Watch:      ' + document.getElementById('eod-status').textContent,
+    '—'.repeat(60),
+    'Signed: ' + (document.getElementById('sig-name').value||'—') + ' at ' + (document.getElementById('sig-time').value||'—'),
+    '=' .repeat(60),
+    'Generated: ' + new Date().toLocaleString(),
+  ];
+  var blob = new Blob([lines.join('\n')], {type:'text/plain'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'SOC_Watch_Log_' + date + '.txt';
+  a.click();
+}
+</script>
+</body>
+</html>
